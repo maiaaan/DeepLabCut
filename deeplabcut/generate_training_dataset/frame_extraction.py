@@ -272,9 +272,11 @@ def extract_frames(
         videos = [v for v in cfg["video_sets"] if v in videos_list]
 
     if mode == "manual":
-        from deeplabcut.gui.widgets import launch_napari
+        #from deeplabcut.gui.widgets import launch_napari
+        import deeplabcut.generate_training_dataset.frame_extractor as fe
 
-        _ = launch_napari(videos[0])
+        #_ = launch_napari(videos[0])
+        fe.frame_extraction_gui(videos[0])
         return
 
     elif mode == "automatic":
