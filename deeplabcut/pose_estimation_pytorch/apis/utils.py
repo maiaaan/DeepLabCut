@@ -231,10 +231,10 @@ def get_scorer_uid(snapshot: Snapshot, detector_snapshot: Snapshot | None) -> st
     Returns:
         the uid to use for the scorer
     """
-    snapshot_id = f"snapshot_{snapshot.uid()}"
+    snapshot_id = f"sshot_{snapshot.uid()}"
     if detector_snapshot is not None:
         detect_id = detector_snapshot.uid()
-        snapshot_id = f"detector_{detect_id}_{snapshot_id}"
+        snapshot_id = f"dtor_{detect_id}_{snapshot_id}"
     return snapshot_id
 
 
@@ -301,7 +301,7 @@ def get_scorer_name(
 
     task, date = cfg["Task"], cfg["date"]
     name = "".join([p.capitalize() for p in net_type.split("_")])
-    return f"DLC_{name}_{task}{date}shuffle{shuffle}_{snapshot_uid}"
+    return f"{name}_shfle{shuffle}_{snapshot_uid}"
 
 
 def list_videos_in_folder(
