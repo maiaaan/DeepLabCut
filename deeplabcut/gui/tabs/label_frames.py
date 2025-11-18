@@ -12,9 +12,11 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import napari
+import time
 
-from PySide6 import QtWidgets
-from PySide6.QtCore import Qt
+from PySide6 import QtWidgets, QtCore
+from PySide6.QtCore import Qt, QEventLoop
 
 from deeplabcut.generate_training_dataset import check_labels
 from deeplabcut.gui.components import DefaultTab
@@ -95,8 +97,34 @@ def label_frames(
             image_dir = data_dir / image_folder
 
         files = [str(image_dir), str(config_path)]
-    _ = launch_napari(files=files)
+    viewer = launch_napari(files=files)
 
+    return viewer
+
+def label_frames_in_loop(config_path, labeled_folders):
+    for folder in labeled_folders:
+
+        print("Labeling folder:", folder)
+        viewer = label_frames(config_path, folder)
+
+        # prefer waiting on the returned viewer; fall back to current_viewer
+        if viewer is None:
+            viewer = napari.current_viewer()
+
+        if viewer is None:
+            # nothing to wait for, continue
+            continue
+
+        # Use a QEventLoop that quits when the napari widget is destroyed (clean, non-blocking)
+        loop = QEventLoop()
+        try:
+            viewer.window.qt_viewer.destroyed.connect(loop.quit)
+            loop.exec()   # runs Qt event loop until the napari window is closed
+        except Exception:
+            # fallback: yield to Qt while polling (still better than tight sleep)
+            while napari.current_viewer() is not None:
+                QtCore.QCoreApplication.processEvents()
+                time.sleep(0.05)
 
 refine_labels = label_frames
 

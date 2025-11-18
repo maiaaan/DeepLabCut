@@ -22,6 +22,7 @@ try:
     from deeplabcut.gui.launch_script import launch_dlc
     from deeplabcut.gui.tabs.label_frames import (
         label_frames,
+        label_frames_in_loop,
         refine_labels,
     )
     from deeplabcut.gui.widgets import SkeletonBuilder

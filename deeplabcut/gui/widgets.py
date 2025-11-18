@@ -35,13 +35,21 @@ from deeplabcut.utils.auxfun_videos import VideoWriter
 
 
 def launch_napari(files=None, plugin="napari-deeplabcut", stack=False):
-    viewer = napari.Viewer()
-    if plugin == "napari-deeplabcut":
-        # Automatically activate the napari-deeplabcut plugin
-        for action in viewer.window.plugins_menu.actions():
-            if "deeplabcut" in action.text():
-                action.trigger()
-                break
+    """
+    Reuse existing napari viewer if present, otherwise create one.
+    Opens files in the single viewer.
+    """
+    viewer = napari.current_viewer()
+    if viewer is None:
+        viewer = napari.Viewer()
+        if plugin == "napari-deeplabcut":
+            for action in viewer.window.plugins_menu.actions():
+                if "deeplabcut" in action.text():
+                    action.trigger()
+                    break
+    else:
+        print("Reusing existing napari viewer")
+
     if files is not None:
         viewer.open(files, plugin=plugin, stack=stack)
     return viewer
